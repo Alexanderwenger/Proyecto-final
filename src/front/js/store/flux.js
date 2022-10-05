@@ -1,9 +1,11 @@
 const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
+      login: false,
+      consultaUsuario: false,
       message: null,
-      registro:[],
-      registros:[],
+      registro: [],
+      registros: [],
       favorites: [], // agrega al carrito las comidas
       comida: [], //trae los detalles de las platos
       comidas: [], // trae los nombre de los platos
@@ -27,6 +29,92 @@ const getState = ({ getStore, getActions, setStore }) => {
       ],
     },
     actions: {
+//VALIDACIÓN DE TOKEN PARA ACCEDER A PAGINAS PROTEGIDAS
+      GetValidacion: (token_por_validar) => {
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + token_por_validar);
+
+        var requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow",
+        };
+
+        fetch(
+          "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us69.gitpod.io/api/validartoken",
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result);
+            if (result.mensaje === "inicio correcto") {
+              setStore({ login: true });
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+      },
+
+//VALIDACIÓN DE EMAIL DE USUARIO PARA RESETEAR CONTRASEÑA
+      ValidacionEmail: (email) => {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({
+          email: email,
+        });
+        var requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        fetch(
+          "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us69.gitpod.io/api/consultaUsuario",
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result);
+            if (result.mensaje === "usuario existe") {
+              setStore({ consultaUsuario: true }); //no se está utilizando
+              MailResetear(email)
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+      },
+
+//ENVIAR CORREO PARA RESETEAR CONTRASEÑA
+      MailResetear: (email) => {
+
+        const MailReset = (e) => {
+          e.preventDefault();
+      
+          emailjs
+            .sendForm(
+              "service_3q83svb",
+              "template_ds0qae1",
+              form.current,
+              "iEJeEfqPLuw3KXA1l"
+            )
+            .then(
+              (result) => {
+                console.log(result.text);
+                setEstado("Enviado");
+              },
+              (error) => {
+                console.log(error.text);
+              }
+            );
+        };
+
+      },
+
+//VALIDACIÓN DE REGISTRO (VERIFICA EXISTENCIA Y REGISTRA NUEVOS USUARIOS)
       Register: (name, email, password, direccion, telefono) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -46,52 +134,62 @@ const getState = ({ getStore, getActions, setStore }) => {
         };
 
         fetch(
-          "https://3001-alexanderwe-proyectofin-f9kcmgspwhj.ws-us67.gitpod.io",
+          "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us69.gitpod.io/api/registro",
           requestOptions
         )
           .then((response) => response.json())
-          .then((result) => console.log(result))
-          .catch((error) => console.log("error", error));
+          .then((result) => {
+            console.log(result);
+            if (result.mensaje === "Usuario no existe") {
+              setStore({ login: true });
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
       },
 
+
+//FUNCIÓN PARA LOGEARSE
+
+Login: (email, password) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  var raw = JSON.stringify({
+    email: email,
+    password: password,
+  });
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  fetch(
+    "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us69.gitpod.io/api/token",
+    requestOptions
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        window.location.href = "/productos";
+      } else {
+        alert("datos mal ingresados");
+      }
+    })
+    .catch((error) => console.log("error", error));
+},
       getBorrar: (id) => {
         const store = getStore();
         const borrar = store.favorites.filter((e, i) => i !== id);
         setStore({ favorites: borrar });
       },
 
-      Login: (email, password) => {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        var raw = JSON.stringify({
-          email: email,
-          password: password,
-        });
-
-        var requestOptions = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
-
-        fetch(
-          "https://3001-alexanderwe-proyectofin-f9kcmgspwhj.ws-us67.gitpod.io/api/token",
-          requestOptions
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-            if (data.token) {
-              localStorage.setItem("token", data.token);
-              window.location.href = "/productos";
-            } else {
-              alert("datos mal ingresados");
-            }
-          })
-          .catch((error) => console.log("error", error));
-      },
       // trae el nombre de la comida
       getComida: (id) => {
         fetch(
@@ -118,7 +216,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
       getRegistro: (id) => {
         fetch(
-          "https://3001-alexanderwe-proyectofin-f9kcmgspwhj.ws-us67.gitpod.io/api/user"+id
+          "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us67.gitpod.io/api/user" +
+            id
         )
           .then((response) => response.json())
           .then((result) => {
@@ -126,10 +225,10 @@ const getState = ({ getStore, getActions, setStore }) => {
           })
           .catch((error) => console.log("DANGER", error));
       },
-      
+
       getRegistros: () => {
         fetch(
-          "https://3001-alexanderwe-proyectofin-f9kcmgspwhj.ws-us67.gitpod.io/api/user"
+          "https://3001-alexanderwe-proyectofin-4xga7qezo9c.ws-us67.gitpod.io/api/user"
         )
           .then((response) => response.json())
           .then((result) => {
@@ -220,7 +319,9 @@ const getState = ({ getStore, getActions, setStore }) => {
           }
         });
         if (guardar == 0) {
-          setStore({ favorites: [...store.favorites, { price: i } ,{name:i}] });
+          setStore({
+            favorites: [...store.favorites, { price: i }, { name: i }],
+          });
         }
       },
 

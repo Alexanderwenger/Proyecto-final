@@ -66,10 +66,13 @@ export const Demo = () => {
 
                         </div>
                     </form>
+
                     <div class="form-group">
+                        <Link to="/resetear">
                         <a href="#" class="btnForgetPwd">
                             Forget Password?
                         </a>
+                        </Link>
                     </div>
                <div>
                 <Link to="/loginadm">

@@ -19,10 +19,13 @@ import { Prueba } from "./pages/prueba";
 import { Sub } from "./pages/sub";
 import { Adm } from "./pages/adm";
 import { Adm1 } from "./pages/adm1";
+import { Checkout } from "./pages/checkout";
+import { ContactoValidacion} from "./pages/contactovalidacion";
 
 import { Stock } from "./pages/stock";
 import { Perfil } from "./pages/perfi";
 import { Loginadm } from "./pages/loginadm";
+import { Resetear } from "./pages/resetear";
 
 
 //create your first component
@@ -42,6 +45,7 @@ const Layout = () => {
                         <Route element={<Razones />} path="/razones" />
                         <Route element={<Productos/>} path ="/productos"/>
                         <Route element={<Contacto/>} path ="/contacto"/>
+                        <Route element={<ContactoValidacion/>} path ="/contactovalidacion"/>
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<Productos2/>} path="/productos2" />
@@ -51,9 +55,10 @@ const Layout = () => {
                         <Route element={<Adm/>} path="/adm" />
                         <Route element={<Adm1/>} path="/adm1" />
                         <Route element={<Loginadm/>} path="/loginadm" />
-
+                        <Route element={<Checkout/>} path="/checkout" />
                         <Route element={<Stock/>} path="/stock" />
                         <Route element={<Perfil/>} path="/perfil" />
+                        <Route element={<Resetear/>} path="/resetear" />
                       
                         
                         <Route element={<h1>Not found!</h1>} />

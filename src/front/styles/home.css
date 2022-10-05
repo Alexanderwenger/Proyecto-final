@@ -205,3 +205,8 @@ p{
 .destacados .box:hover .content p {
   transform: translateY(0px);
 }
+
+.fail {
+  color: red;
+  font-size: 12px;
+}

@@ -24,19 +24,19 @@ export const Register = () => {
                     <h3>Registro</h3>
 
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)}/>
+                        <input type="text" class="form-control" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                        <input type="text" class="form-control" placeholder="Tu correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)}/>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)}/>
+                        <input type="text" class="form-control" placeholder="Tu dirección" value={direccion} onChange={(e) => setDireccion(e.target.value)}/>
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" placeholder="Your Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                        <input type="password" class="form-control" placeholder="Tu contraseña" value={password} onChange={(e) => setPassword(e.target.value)}/>
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" placeholder="Your Phone" value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
+                        <input type="password" class="form-control" placeholder="Tu teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
                     </div>
                     <div class="form-group">
                         <Link to="/demo">

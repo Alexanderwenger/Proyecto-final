@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User , Platos, FavPlatos , Veget , Dulce ,Vip 
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
-
+import datetime
 
 api = Blueprint('api', __name__)
 
@@ -19,6 +19,19 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+#CONSULTA SI EXISTE EMAIL DE USUARIO PARA RESETEAR PASSWORD
+@api.route('/consultaUsuario', methods=['GET'])
+def consultaUsuario():
+    datos = request.get_json()
+    consulta = User.query.filter_by(email = datos['email']).first()
+    if (consulta):
+        return 'Usuario existe'
+        expiracion = datetime.timedelta(minutes=1)
+        token_resetea_password = create_access_token(identity=datos['email'], expires_delta= expiracion)
+    else:
+        return jsonify({"mensaje": 'usuario no registrado'})
+
+#REGISTRA USUARIOS (VERIFICA QUE NO EXISTA PREVIAMENTE)
 @api.route('/registro', methods=['POST'])
 def set_user():
     datos = request.get_json()
@@ -39,6 +52,7 @@ def set_user():
     db.session.commit()
     return 'Usuario Registrado'
 
+#VALIDA USUARIO PARA LOGIN Y ENTREGA TOKEN PARA SESION
 @api.route("/token", methods=["POST"])
 def token():
     body = request.get_json()
@@ -49,8 +63,8 @@ def token():
         #Validacion de usuario
         if(user.password== body['password']):
             #Valida, otorga token
-            #expiracion = datetime.timedelta(minutes=1)
-            token = create_access_token(identity=body['email'])
+            expiracion = datetime.timedelta(minutes=1)
+            token = create_access_token(identity=body['email'], expires_delta= expiracion)
             return jsonify({
                 "email": body['email'],
                 "password": body['password'],
@@ -63,7 +77,12 @@ def token():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
-
+#VALIDA TOKEN PARA NAVEGAR PAGINAS PROTEGIDAS
+@api.route("/validartoken", methods=["GET"])
+@jwt_required()
+def validartoken():
+    identidad = get_jwt_identity()
+    return {"mensaje" : "inicio correcto"}
 
 @api.route('/platos', methods=['GET'])
 def getPlatos():
